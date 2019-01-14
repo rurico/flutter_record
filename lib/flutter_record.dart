@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 
+/// Singleton class that communicate with a FlutterRecord Instance
 class FlutterRecord {
   static FlutterRecord _instance;
 
@@ -19,10 +20,13 @@ class FlutterRecord {
     return version;
   }
 
+  /// Feedback volume of steam
   StreamController<double> volumeController = StreamController.broadcast();
 
+  /// Player is playing?
   bool isPlaying = false;
 
+  /// Recorder is isRecording?
   bool isRecording = false;
 
   Future<void> _handleCallback(MethodCall call) async {
@@ -37,7 +41,8 @@ class FlutterRecord {
     }
   }
 
-  FutureOr<String> startRecorder({String path, double maxVolume}) async {
+  /// Start recorder
+  Future<String> startRecorder({String path, double maxVolume}) async {
     assert(path != null);
     if (!isRecording) {
       isRecording = true;
@@ -63,7 +68,7 @@ class FlutterRecord {
       isRecording = false;
 
       try {
-        print(await _channel.invokeMethod(method));
+        await _channel.invokeMethod(method);
       } catch (e) {
         print(e);
       } finally {
@@ -72,14 +77,17 @@ class FlutterRecord {
     }
   }
 
+  /// Stop recorder
   Future<void> stopRecorder() async {
     _stop('stopRecorder');
   }
 
+  /// Cancel recording audio
   Future<void> cancelRecorder() async {
     _stop('cancelRecorder');
   }
 
+  /// Start current play audio
   Future<void> startPlayer({String path}) async {
     assert(path != null);
 
@@ -88,47 +96,53 @@ class FlutterRecord {
     isPlaying = true;
 
     try {
-      print(await _channel.invokeMethod('startPlayer', {'path': path}));
+      await _channel.invokeMethod('startPlayer', {'path': path});
     } catch (e) {
       print(e);
     }
   }
 
+  /// Stop current play audio
   Future<void> stopPlayer() async {
     if (isPlaying) {
       isPlaying = false;
 
       try {
-        print(await _channel.invokeMethod('stopPlayer'));
+        await _channel.invokeMethod('stopPlayer');
       } catch (e) {
         print(e);
       }
     }
   }
 
+  /// get `path` audio duration
   Future<int> getDuration({String path}) async {
     final dynamic duration =
         await _channel.invokeMethod('getDuration', {'path': path});
     return duration ?? 0;
   }
 
+  /// set current player volume
   Future<void> setVolume(double volume) async {
     try {
-      print(await _channel.invokeMethod('setVolume', {'volume': volume}));
+      await _channel.invokeMethod('setVolume', {'volume': volume});
     } catch (e) {
       print(e);
     }
   }
 
+  /// on play complete
   void _playComplete() {
     print('complete');
     isPlaying = false;
   }
 
+  /// volume listener stream
   void _volumeListener(double volume) {
     volumeController.sink.add(volume);
   }
 
+  /// remove volume listener
   void _volumeRemoveListener() {
     volumeController
       ..add(0)
