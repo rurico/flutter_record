@@ -60,7 +60,7 @@ class _MyAppState extends State<MyApp> {
 
                   print(path);
 
-                  _flutterRecord.volumeController.stream.listen((volume) {
+                  _flutterRecord.volumeSubscription.stream.listen((volume) {
                     setState(() {
                       _volume = volume;
                     });
@@ -84,6 +84,12 @@ class _MyAppState extends State<MyApp> {
                 onPressed: () async {
                   await _flutterRecord.startPlayer(path: 'test');
                   await _flutterRecord.setVolume(1.0);
+                },
+              ),
+              FlatButton(
+                child: Text('pausePlayer'),
+                onPressed: () async {
+                  await _flutterRecord.pausePlayer();
                 },
               ),
               FlatButton(

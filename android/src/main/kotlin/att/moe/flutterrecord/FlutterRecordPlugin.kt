@@ -24,6 +24,8 @@ class FlutterRecordPlugin : MethodCallHandler {
   private var lastRecordPath: String = ""
 
   private var isRecording: Boolean = false
+  private var isPause: Boolean = false
+  private var pausePosition = 0
 
   private var mediaPlayer: MediaPlayer? = null
   private var mediaRecorder: MediaRecorder? = null
@@ -31,7 +33,7 @@ class FlutterRecordPlugin : MethodCallHandler {
   private var runnable: Runnable? = null
   private val taskHandler = Handler()
 
-  private val frequency = 500L
+  private val frequency = 125L
 
   companion object {
     private lateinit var reg: Registrar
@@ -58,6 +60,7 @@ class FlutterRecordPlugin : MethodCallHandler {
         this.startPlayer(path, result)
       }
       "stopPlayer" -> this.stopPlayer(result)
+      "pausePlayer" -> this.pausePlayer(result)
       "getDuration" -> {
         val path = call.argument<String>("path")!!
         this.getDuration(path, result)
@@ -74,6 +77,7 @@ class FlutterRecordPlugin : MethodCallHandler {
     if (ContextCompat.checkSelfPermission(reg.context(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED
             || ContextCompat.checkSelfPermission(reg.context(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
       ActivityCompat.requestPermissions(reg.activity(), arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE), 0)
+      recordComplete()
       return
     }
 
@@ -156,9 +160,23 @@ class FlutterRecordPlugin : MethodCallHandler {
     MethodChannel(reg.messenger(), channelName).invokeMethod("playComplete", "play complete")
   }
 
+  private fun recordComplete() {
+    MethodChannel(reg.messenger(), channelName).invokeMethod("recordComplete", "record complete")
+  }
+
   private fun startPlayer(path: String, result: Result) {
     if (mediaPlayer == null) {
       mediaPlayer = MediaPlayer()
+    }
+
+    if (isPause) {
+      mediaPlayer?.apply {
+        seekTo(pausePosition)
+        start()
+      }
+      pausePosition = 0
+      isPause = false
+      return
     }
 
     if (mediaPlayer!!.isPlaying) {
@@ -182,6 +200,19 @@ class FlutterRecordPlugin : MethodCallHandler {
       }
     } catch (e: Exception) {
       result.error(channelName, "stop play failed", e.printStackTrace())
+    }
+  }
+
+  private fun pausePlayer(result: Result) {
+    try {
+       mediaPlayer?.apply {
+        pause()
+        currentPosition
+      }
+      isPause = true
+      pausePosition = mediaPlayer!!.currentPosition
+    } catch (e: Exception) {
+      result.error(channelName, "pause play failed", e.printStackTrace())
     }
   }
 

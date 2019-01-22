@@ -21,13 +21,22 @@ class FlutterRecord {
   }
 
   /// Feedback volume of steam
-  StreamController<double> volumeController = StreamController.broadcast();
+  StreamController<double> volumeSubscription = StreamController.broadcast();
 
   /// Player is playing?
   bool isPlaying = false;
 
   /// Recorder is isRecording?
   bool isRecording = false;
+
+  /// Timer
+  Timer _timer;
+
+  /// get record duration
+  StreamController<int> recordSubscription = StreamController.broadcast();
+
+  /// get play duration
+  StreamController<int> playSubscription = StreamController.broadcast();
 
   Future<void> _handleCallback(MethodCall call) async {
     switch (call.method) {
@@ -37,6 +46,9 @@ class FlutterRecord {
         break;
       case 'playComplete':
         _playComplete();
+        break;
+      case 'recordComplete':
+        recordComplete();
         break;
     }
   }
@@ -54,6 +66,14 @@ class FlutterRecord {
       }
 
       try {
+        if (_timer != null) {
+          _timer.cancel();
+          _timer = null;
+        }
+        _timer = _getCurrentTimeTimer(DateTime.now().millisecondsSinceEpoch,
+            (int currentTime) {
+          _recordListener(DateTime.now().millisecondsSinceEpoch - currentTime);
+        });
         String result = await _channel.invokeMethod('startRecorder', params);
         return result;
       } catch (e) {
@@ -61,6 +81,13 @@ class FlutterRecord {
       }
     }
     return 'Recorder is already recording.';
+  }
+
+  Timer _getCurrentTimeTimer(int currentTime, void callback(int currentTime)) {
+    return Timer.periodic(
+      Duration(microseconds: 50),
+      (Timer _) => callback(currentTime),
+    );
   }
 
   Future<void> _stop(String method) async {
@@ -73,6 +100,7 @@ class FlutterRecord {
         print(e);
       } finally {
         _volumeRemoveListener();
+        _recordRemoveListener();
       }
     }
   }
@@ -96,9 +124,30 @@ class FlutterRecord {
     isPlaying = true;
 
     try {
+      if (_timer != null) {
+        _timer.cancel();
+        _timer = null;
+      }
+      _timer = _getCurrentTimeTimer(DateTime.now().millisecondsSinceEpoch,
+          (int currentTime) {
+        _playListener(DateTime.now().millisecondsSinceEpoch - currentTime);
+      });
       await _channel.invokeMethod('startPlayer', {'path': path});
     } catch (e) {
       print(e);
+    }
+  }
+
+  /// Pause current play audio
+  Future<void> pausePlayer() async {
+    if (isPlaying) {
+      try {
+        _playComplete();
+
+        await _channel.invokeMethod('pausePlayer');
+      } catch (e) {
+        print(e);
+      }
     }
   }
 
@@ -106,6 +155,8 @@ class FlutterRecord {
   Future<void> stopPlayer() async {
     if (isPlaying) {
       isPlaying = false;
+
+      _playComplete();
 
       try {
         await _channel.invokeMethod('stopPlayer');
@@ -133,20 +184,65 @@ class FlutterRecord {
 
   /// on play complete
   void _playComplete() {
-    print('complete');
+    print('play complete');
     isPlaying = false;
+    _playRemoveListener();
+  }
+
+  /// on record complete
+  void recordComplete() {
+    print('record complete');
+    isRecording = false;
   }
 
   /// volume listener stream
   void _volumeListener(double volume) {
-    volumeController.sink.add(volume);
+    volumeSubscription.sink.add(volume);
   }
 
   /// remove volume listener
   void _volumeRemoveListener() {
-    volumeController
+    volumeSubscription
       ..add(0)
       ..close();
-    volumeController = StreamController.broadcast();
+    volumeSubscription = null;
+    volumeSubscription = StreamController.broadcast();
+  }
+
+  /// volume listener stream
+  void _recordListener(int volume) {
+    print('_recordListener$volume');
+    recordSubscription.sink.add(volume);
+  }
+
+  /// remove volume listener
+  void _recordRemoveListener() {
+    recordSubscription
+      ..add(0)
+      ..close();
+    recordSubscription = null;
+    recordSubscription = StreamController.broadcast();
+    _resetTimer();
+  }
+
+  /// volume listener stream
+  void _playListener(int volume) {
+    print('_playListener$volume');
+    playSubscription.sink.add(volume);
+  }
+
+  /// remove volume listener
+  void _playRemoveListener() {
+    playSubscription
+      ..add(0)
+      ..close();
+    playSubscription = null;
+    playSubscription = StreamController.broadcast();
+    _resetTimer();
+  }
+
+  void _resetTimer() {
+    _timer.cancel();
+    _timer = null;
   }
 }

@@ -5,6 +5,9 @@ import AVFoundation
 public class SwiftFlutterRecordPlugin: NSObject, FlutterPlugin, AVAudioPlayerDelegate {
   private let channelName = "flutter_record"
   private var lastRecordPath: URL?
+
+  private var isPause: Bool = false
+  private var pausePosition = 0
   
   private var player: AVAudioPlayer?
   private var recorder: AVAudioRecorder?
@@ -40,6 +43,8 @@ public class SwiftFlutterRecordPlugin: NSObject, FlutterPlugin, AVAudioPlayerDel
     case "startPlayer":
       let path = args!["path"] as! String
       self.startPlayer(path, result)
+    case "pausePlayer":
+      self.pausePlayer(result)
     case "stopPlayer":
       self.stopPlayer(result)
     case "getDuration":
@@ -66,8 +71,8 @@ public class SwiftFlutterRecordPlugin: NSObject, FlutterPlugin, AVAudioPlayerDel
   @objc private func updateVolume() {
     recorder!.updateMeters()
     let db = recorder!.averagePower(forChannel: 0)
-    let atai = Double(self.volume! * (Double(db) + 77.0) / 77.0)
-    channel.invokeMethod("updateVolume", arguments: "{\"current_volume\": \(atai)}")
+    let volume = Double(self.volume! * (Double(db) + 77.0) / 77.0)
+    channel.invokeMethod("updateVolume", arguments: "{\"current_volume\": \(volume)}")
   }
   
   private func startRecorder(_ path: String, _ maxVolume: String?, _ result: FlutterResult) {
@@ -101,7 +106,7 @@ public class SwiftFlutterRecordPlugin: NSObject, FlutterPlugin, AVAudioPlayerDel
     
     if maxVolume != nil {
       self.volume = Double(maxVolume!)!
-      timer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(self.updateVolume), userInfo: nil, repeats: true)
+      timer = Timer.scheduledTimer(timeInterval: 0.125, target: self, selector: #selector(self.updateVolume), userInfo: nil, repeats: true)
       print(timer!)
     }
   }
@@ -136,6 +141,11 @@ public class SwiftFlutterRecordPlugin: NSObject, FlutterPlugin, AVAudioPlayerDel
   }
 
   private func startPlayer(_ path: String, _ result: FlutterResult) {
+    if isPause && player != nil {
+      player!.play(atTime: self.pausePosition)
+      pausePosition = 0
+      isPause = false
+    }
     let fileManager = FileManager.default
     let url = URL(fileURLWithPath: "\(NSTemporaryDirectory())\(path).aac")
     if fileManager.fileExists(atPath: url.absoluteString.replacingOccurrences(of: "file://", with: "")) {
@@ -151,6 +161,17 @@ public class SwiftFlutterRecordPlugin: NSObject, FlutterPlugin, AVAudioPlayerDel
       }
     } else {
       _playComplete()
+    }
+  }
+
+  private func pausePlayer(_ result: FlutterResult) {
+    if player != nil {
+      if player!.isPlaying {
+        player!.pause()
+        isPause = true
+        self.pausePosition = player!.currentTime
+        result("pause play success")
+      }
     }
   }
   
