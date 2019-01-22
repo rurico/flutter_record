@@ -48,6 +48,7 @@ class FlutterRecordPlugin : MethodCallHandler {
   override fun onMethodCall(call: MethodCall, result: Result) {
     when (call.method) {
       "getPlatformVersion" -> result.success("Android ${android.os.Build.VERSION.RELEASE}")
+      "getBasePath" -> result.success("${Environment.getExternalStorageDirectory().absolutePath}")
       "startRecorder" -> {
         val path = call.argument<String>("path")!!
         val maxVolume = call.argument<String>("maxVolume")

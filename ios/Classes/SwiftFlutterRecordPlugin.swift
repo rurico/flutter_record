@@ -32,6 +32,8 @@ public class SwiftFlutterRecordPlugin: NSObject, FlutterPlugin, AVAudioPlayerDel
     switch call.method {
     case "getPlatformVersion":
       result("iOS \(UIDevice.current.systemVersion)")
+    case "getBasePath":
+      result("\(NSTemporaryDirectory())")
     case "startRecorder":
       let path = args!["path"] as! String
       let maxVolume = args!["maxVolume"] as? String

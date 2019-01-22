@@ -1,3 +1,6 @@
+## 0.1.3
+* add getBasePath api
+
 ## 0.1.2
 * remove recordSubscription and playSubscription from lib/flutter_record.dart.
 

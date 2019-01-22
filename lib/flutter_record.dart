@@ -20,6 +20,11 @@ class FlutterRecord {
     return version;
   }
 
+  static Future<String> get getBasePath async {
+    final String basePath = await _channel.invokeMethod('getBasePath');
+    return basePath;
+  }
+
   /// Feedback volume of steam
   StreamController<double> volumeSubscription = StreamController.broadcast();
 
