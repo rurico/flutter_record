@@ -7,7 +7,7 @@ public class SwiftFlutterRecordPlugin: NSObject, FlutterPlugin, AVAudioPlayerDel
   private var lastRecordPath: URL?
 
   private var isPause: Bool = false
-  private var pausePosition = 0
+  private var pausePosition: TimeInterval = 0
   
   private var player: AVAudioPlayer?
   private var recorder: AVAudioRecorder?
@@ -73,7 +73,7 @@ public class SwiftFlutterRecordPlugin: NSObject, FlutterPlugin, AVAudioPlayerDel
   @objc private func updateVolume() {
     recorder!.updateMeters()
     let db = recorder!.averagePower(forChannel: 0)
-    let volume = Double(self.volume! * (Double(db) + 77.0) / 77.0)
+    let volume = Double(self.volume! * (Double(db) + 160.0) / 160.0)
     channel.invokeMethod("updateVolume", arguments: "{\"current_volume\": \(volume)}")
   }
   
@@ -143,10 +143,15 @@ public class SwiftFlutterRecordPlugin: NSObject, FlutterPlugin, AVAudioPlayerDel
   }
 
   private func startPlayer(_ path: String, _ result: FlutterResult) {
-    if isPause && player != nil {
-      player!.play(atTime: self.pausePosition)
-      pausePosition = 0
-      isPause = false
+    if isPause {
+      if player != nil {
+        let shortStartDelay = 0.01
+        player!.prepareToPlay()
+        player!.play(atTime: pausePosition + shortStartDelay)
+        pausePosition = 0
+        isPause = false
+        return 
+      }
     }
     let fileManager = FileManager.default
     let url = URL(fileURLWithPath: "\(NSTemporaryDirectory())\(path).aac")
@@ -171,7 +176,7 @@ public class SwiftFlutterRecordPlugin: NSObject, FlutterPlugin, AVAudioPlayerDel
       if player!.isPlaying {
         player!.pause()
         isPause = true
-        self.pausePosition = player!.currentTime
+        pausePosition = player!.currentTime
         result("pause play success")
       }
     }
