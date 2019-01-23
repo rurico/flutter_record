@@ -53,7 +53,7 @@ class FlutterRecord {
         _playComplete();
         break;
       case 'recordComplete':
-        recordComplete();
+        _recordComplete();
         break;
     }
   }
@@ -195,7 +195,7 @@ class FlutterRecord {
   }
 
   /// on record complete
-  void recordComplete() {
+  void _recordComplete() {
     print('record complete');
     isRecording = false;
   }

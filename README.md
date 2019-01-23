@@ -3,7 +3,7 @@
 A flutter plugin for recorder audio and audio player.of course, you can cancel the recording.
 
 <p align="left">
-  <a href="https://pub.dartlang.org/packages/flutter_record"><img alt="pub version" src="https://img.shields.io/badge/pub-v0.1.1-blue.svg"></a>
+  <a href="https://pub.dartlang.org/packages/flutter_record"><img alt="pub version" src="https://img.shields.io/badge/pub-v0.1.4-blue.svg"></a>
 </p>
 
 ## Installation
