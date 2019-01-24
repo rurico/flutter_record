@@ -1,3 +1,5 @@
+## 0.1.8
+* fix: fix ios build swift version error
 ## 0.1.3
 * add getBasePath api
 

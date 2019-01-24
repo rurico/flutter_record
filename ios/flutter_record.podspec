@@ -10,7 +10,7 @@ A new flutter plugin project.
                        DESC
   s.homepage         = 'http://example.com'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'att.moe' => 'baichan@outlook.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
@@ -19,4 +19,3 @@ A new flutter plugin project.
 
   s.ios.deployment_target = '8.0'
 end
-
