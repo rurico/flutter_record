@@ -5,7 +5,7 @@ import AVFoundation
 public class SwiftFlutterRecordPlugin: NSObject, FlutterPlugin, AVAudioPlayerDelegate {
   private let channelName = "flutter_record"
   private var lastRecordPath: URL?
-
+  
   private var isPause: Bool = false
   private var pausePosition: TimeInterval = 0
   
@@ -66,7 +66,7 @@ public class SwiftFlutterRecordPlugin: NSObject, FlutterPlugin, AVAudioPlayerDel
     channel.invokeMethod("playComplete", arguments: "play complete")
   }
   
-  @objc func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
+  private func audioPlayerDidFinishPlaying(_ player: AVAudioPlayer, successfully flag: Bool) {
     _playComplete()
   }
   
@@ -90,7 +90,11 @@ public class SwiftFlutterRecordPlugin: NSObject, FlutterPlugin, AVAudioPlayerDel
     let session = AVAudioSession.sharedInstance()
     
     do {
-      try? session.setCategory(AVAudioSessionCategoryPlayAndRecord)
+      if #available(iOS 10.0, *) {
+        try?  session.setCategory(.playAndRecord, mode: .default)
+      } else {
+        session.perform(NSSelectorFromString("setCategory:error:"), with: AVAudioSession.Category.playback)
+      }
       try session.setActive(true)
       
       if let recordPath = lastRecordPath {
@@ -141,7 +145,7 @@ public class SwiftFlutterRecordPlugin: NSObject, FlutterPlugin, AVAudioPlayerDel
     }
     volume = nil
   }
-
+  
   private func startPlayer(_ path: String, _ result: FlutterResult) {
     if isPause {
       if player != nil {
@@ -150,7 +154,7 @@ public class SwiftFlutterRecordPlugin: NSObject, FlutterPlugin, AVAudioPlayerDel
         player!.play(atTime: pausePosition + shortStartDelay)
         pausePosition = 0
         isPause = false
-        return 
+        return
       }
     }
     let fileManager = FileManager.default
@@ -158,7 +162,7 @@ public class SwiftFlutterRecordPlugin: NSObject, FlutterPlugin, AVAudioPlayerDel
     if fileManager.fileExists(atPath: url.absoluteString.replacingOccurrences(of: "file://", with: "")) {
       do {
         player = try AVAudioPlayer(contentsOf: url)
-
+        
         player!.delegate = self
         
         player!.play()
@@ -170,7 +174,7 @@ public class SwiftFlutterRecordPlugin: NSObject, FlutterPlugin, AVAudioPlayerDel
       _playComplete()
     }
   }
-
+  
   private func pausePlayer(_ result: FlutterResult) {
     if player != nil {
       if player!.isPlaying {
