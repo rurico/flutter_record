@@ -47,6 +47,7 @@ class FlutterRecordPlugin : MethodCallHandler {
 
   override fun onMethodCall(call: MethodCall, result: Result) {
     when (call.method) {
+      "requestPermission" -> this.requestPermission()
       "getPlatformVersion" -> result.success("Android ${android.os.Build.VERSION.RELEASE}")
       "getBasePath" -> result.success("${Environment.getExternalStorageDirectory().absolutePath}")
       "startRecorder" -> {
@@ -71,6 +72,14 @@ class FlutterRecordPlugin : MethodCallHandler {
         this.setVolume(volume, result)
       }
       else -> result.notImplemented()
+    }
+  }
+
+  private fun requestPermission() {
+    if (ContextCompat.checkSelfPermission(reg.context(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED
+            || ContextCompat.checkSelfPermission(reg.context(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+      ActivityCompat.requestPermissions(reg.activity(), arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE), 0)
+      result.success(true)
     }
   }
 
@@ -206,7 +215,7 @@ class FlutterRecordPlugin : MethodCallHandler {
 
   private fun pausePlayer(result: Result) {
     try {
-       mediaPlayer?.apply {
+      mediaPlayer?.apply {
         pause()
         currentPosition
       }

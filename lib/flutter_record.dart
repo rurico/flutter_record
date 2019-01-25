@@ -58,6 +58,11 @@ class FlutterRecord {
     }
   }
 
+  Future<bool> requestPermission() async {
+    bool result = await _channel.invokeMethod('requestPermission');
+    return result;
+  }
+
   /// Start recorder
   Future<String> startRecorder({String path, double maxVolume}) async {
     assert(path != null);

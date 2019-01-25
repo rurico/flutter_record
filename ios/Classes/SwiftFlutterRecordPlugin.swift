@@ -49,6 +49,8 @@ public class SwiftFlutterRecordPlugin: NSObject, FlutterPlugin, AVAudioPlayerDel
       self.pausePlayer(result)
     case "stopPlayer":
       self.stopPlayer(result)
+    case "requestPermission":
+      result(true)
     case "getDuration":
       let path = args!["path"] as! String
       self.getDuration(path, result)
