@@ -1,7 +1,12 @@
+## 0.1.11
+* fix: android requestPermission api return value
+
 ## 0.1.9
 * feature: add requestPermission api
+
 ## 0.1.8
 * fix: fix ios build swift version error
+
 ## 0.1.3
 * add getBasePath api
 
