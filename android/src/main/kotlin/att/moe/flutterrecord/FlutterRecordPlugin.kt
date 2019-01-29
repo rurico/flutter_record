@@ -79,9 +79,9 @@ class FlutterRecordPlugin : MethodCallHandler {
     if (ContextCompat.checkSelfPermission(reg.context(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED
             || ContextCompat.checkSelfPermission(reg.context(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
       ActivityCompat.requestPermissions(reg.activity(), arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE), 0)
+      result.success(ContextCompat.checkSelfPermission(reg.context(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED
+              && ContextCompat.checkSelfPermission(reg.context(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
     }
-    result.success(ContextCompat.checkSelfPermission(reg.context(), Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED
-            && ContextCompat.checkSelfPermission(reg.context(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
   }
 
   private fun startRecorder(path: String, maxVolume: String?, result: Result) {
