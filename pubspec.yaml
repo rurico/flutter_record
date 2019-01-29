@@ -1,6 +1,6 @@
 name: flutter_record
 description: A flutter plugin for recorder audio and audio player.of course, you can cancel the recording.
-version: 0.1.13
+version: 0.1.14
 author: Tenkai Ruri<babichan@outlook.com>
 homepage: https://github.com/TenkaiRuri/flutter_record
 

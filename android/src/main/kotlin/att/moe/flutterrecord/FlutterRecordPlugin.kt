@@ -81,6 +81,9 @@ class FlutterRecordPlugin : MethodCallHandler {
       ActivityCompat.requestPermissions(reg.activity(), arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.WRITE_EXTERNAL_STORAGE), 0)
       result.success(ContextCompat.checkSelfPermission(reg.context(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
               && ContextCompat.checkSelfPermission(reg.context(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
+    } else {
+      result.success(ContextCompat.checkSelfPermission(reg.context(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+              && ContextCompat.checkSelfPermission(reg.context(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)
     }
   }
 
