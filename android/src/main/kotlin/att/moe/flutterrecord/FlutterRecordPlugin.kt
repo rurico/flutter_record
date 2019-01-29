@@ -110,6 +110,8 @@ class FlutterRecordPlugin : MethodCallHandler {
         setAudioSource(MediaRecorder.AudioSource.MIC)
         setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
         setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+        setAudioSamplingRate(16000)
+        setAudioChannels(1)
         setOutputFile(lastRecordPath)
         prepare()
         start()
