@@ -1,3 +1,6 @@
+## 0.2.0
+* fix: android setAudioSamplingRate setAudioChannels equal to ios
+
 ## 0.1.11
 * fix: android requestPermission api return value
 
