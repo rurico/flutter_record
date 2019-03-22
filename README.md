@@ -1,7 +1,5 @@
 # DEPRECATED
-This is no longer supported, please consider using [flutter_sound](https://github.com/dooboolab/flutter_sound) instead.
-
-[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
+# This is no longer supported, please consider using [flutter_sound](https://github.com/dooboolab/flutter_sound) instead.
 
 A flutter plugin for recorder audio and audio player.of course, you can cancel the recording.
 
