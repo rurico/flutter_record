@@ -82,7 +82,7 @@ public class SwiftFlutterRecordPlugin: NSObject, FlutterPlugin, AVAudioPlayerDel
   private func startRecorder(_ path: String, _ maxVolume: String?, _ result: FlutterResult) {
     let recordSetting: [String: Any] = [
       AVSampleRateKey: NSNumber(value: 16000),
-      AVFormatIDKey: (value: kAudioFormatMPEG4AAC),
+      AVFormatIDKey: kAudioFormatMPEG4AAC,
       AVNumberOfChannelsKey: NSNumber(value: 1),
       AVEncoderAudioQualityKey: NSNumber(value: AVAudioQuality.min.rawValue)
     ]
