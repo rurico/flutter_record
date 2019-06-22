@@ -34,15 +34,6 @@ class FlutterRecord {
   /// Recorder is isRecording?
   bool isRecording = false;
 
-  // /// Timer
-  // Timer _timer;
-
-  // /// get record duration
-  // StreamController<int> recordSubscription = StreamController.broadcast();
-
-  // /// get play duration
-  // StreamController<int> playSubscription = StreamController.broadcast();
-
   Future<void> _handleCallback(MethodCall call) async {
     switch (call.method) {
       case 'updateVolume':
@@ -218,39 +209,4 @@ class FlutterRecord {
     volumeSubscription = null;
     volumeSubscription = StreamController.broadcast();
   }
-
-  // /// volume listener stream
-  // void _recordListener(int volume) {
-  //   recordSubscription.sink.add(volume);
-  // }
-
-  // /// remove volume listener
-  // void _recordRemoveListener() {
-  //   recordSubscription
-  //     ..add(0)
-  //     ..close();
-  //   recordSubscription = null;
-  //   recordSubscription = StreamController.broadcast();
-  //   _resetTimer();
-  // }
-
-  // /// volume listener stream
-  // void _playListener(int volume) {
-  //   playSubscription.sink.add(volume);
-  // }
-
-  // /// remove volume listener
-  // void _playRemoveListener() {
-  //   playSubscription
-  //     ..add(0)
-  //     ..close();
-  //   playSubscription = null;
-  //   playSubscription = StreamController.broadcast();
-  //   _resetTimer();
-  // }
-
-  // void _resetTimer() {
-  //   _timer.cancel();
-  //   _timer = null;
-  // }
 }

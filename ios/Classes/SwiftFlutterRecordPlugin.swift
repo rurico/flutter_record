@@ -160,7 +160,7 @@ public class SwiftFlutterRecordPlugin: NSObject, FlutterPlugin, AVAudioPlayerDel
       }
     }
     let fileManager = FileManager.default
-    let url = URL(fileURLWithPath: "\(NSTemporaryDirectory())\(path).aac")
+    let url = URL(fileURLWithPath: path)
     if fileManager.fileExists(atPath: url.absoluteString.replacingOccurrences(of: "file://", with: "")) {
       do {
         player = try AVAudioPlayer(contentsOf: url)
@@ -198,7 +198,7 @@ public class SwiftFlutterRecordPlugin: NSObject, FlutterPlugin, AVAudioPlayerDel
   }
   
   private func getDuration(_ path: String, _ result: FlutterResult)  {
-    let asset = AVURLAsset(url: URL(fileURLWithPath: "\(NSTemporaryDirectory())\(path).aac"))
+    let asset = AVURLAsset(url: URL(fileURLWithPath: path))
     let audioDuration = asset.duration
     let audioDurationSeconds = CMTimeGetSeconds(audioDuration)
     result(Int(audioDurationSeconds * 1000.0))

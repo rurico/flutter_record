@@ -200,11 +200,9 @@ class FlutterRecordPlugin : MethodCallHandler {
       return
     }
 
-    val mPath = "${Environment.getExternalStorageDirectory().absolutePath}/$path.aac"
-
     try {
       mediaPlayer?.apply {
-        setDataSource(mPath)
+        setDataSource(path)
         setOnCompletionListener {
           playComplete()
           result.success("start play success")
@@ -242,9 +240,8 @@ class FlutterRecordPlugin : MethodCallHandler {
   }
 
   private fun getDuration(path: String, result: Result) {
-    val mPath = "${Environment.getExternalStorageDirectory().absolutePath}/$path.aac"
-    if (!File(mPath).isFile) return
-    val uri = Uri.parse(mPath)
+    if (!File(path).isFile) return
+    val uri = Uri.parse(path)
     val mmr = MediaMetadataRetriever()
     mmr.setDataSource(reg.context(), uri)
     val durationStr = mmr.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
